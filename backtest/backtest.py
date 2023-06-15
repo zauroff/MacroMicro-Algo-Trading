@@ -2,8 +2,9 @@ from backtesting import Backtest, Strategy
 from backtesting.test import SMA
 import numpy as np
 import yfinance as yf
+from decimal import Decimal
 
-hist =yf.download('EURUSD=X', start='2023-05-02', end='2023-06-03', interval= "15m")
+hist =yf.download('EURUSD=X', start='2023-06-6', end='2023-06-12', interval= "5m")
 
 
 
@@ -50,6 +51,7 @@ class MicroMacro(Strategy):
         
         price = self.data.Close[-1]
 
+
     
         if self.buysig > 0:
             delayMultiplier = self.buysig
@@ -66,7 +68,9 @@ class MicroMacro(Strategy):
 
         
         #MACRO
+        
         if self.tick % 20 == 0:
+            price = float(Decimal(price) + Decimal(.00005))
             if price < ma30 and price < ma35:
                 if self.buysig < self.limit:
                     
@@ -76,7 +80,7 @@ class MicroMacro(Strategy):
                     self.bought += qnty
                     Strategy.buy(self, size = qnty)
                     
-                    
+            price = float(Decimal(price) - Decimal(.00005))        
             if price > ma30 and price > ma35:
                 if self.sellsig < self.limit:
                     
@@ -95,6 +99,7 @@ class MicroMacro(Strategy):
         
         #MICRO
         if self.tick % 30 == 0:
+            price = float(Decimal(price) + Decimal(.00005))
             if price < ma10 and price < ma5:
                 if self.buysig < self.limit:
                     
@@ -105,6 +110,7 @@ class MicroMacro(Strategy):
                     Strategy.buy(self, size = qnty)
                     
                     
+            price = float(Decimal(price) - Decimal(.00005))
             if price > ma10 and price > ma5:
                 if self.sellsig < self.limit:
                     

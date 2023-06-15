@@ -21,6 +21,9 @@ class Algo():
             self.limit = 20
             self.inv = 0
         
+        def position(self):
+            return client.positions[1]
+
         def live(self, pair):
             return client.forexLive(pair)
         
@@ -67,12 +70,12 @@ class Algo():
                 plt.ion()
                 plt.clf()
                 plt.title(f'Tick: {tick}')
-                hist.plot(figsize=(8,8))
+                hist.plot(figsize=(5,5))
                 ma5.plot()
                 ma10.plot()
                 ma30.plot()
                 ma35.plot()
-            
+
                 plt.legend([f'{pair} Price','MA5','MA10','MA30','MA35'])
                 plt.pause(.01)
             
@@ -80,10 +83,16 @@ class Algo():
         def qnty(self, maX, maY, price, action, size: int):
             
             if action == 'BUY':
-                return round((1 - (price/(np.mean([maX,maY])))) * (size * 100000))
+                if self.limit == self.sell_sigs:
+                    return -self.position()
+                else:
+                    return round((1 - (price/(np.mean([maX,maY])))) * (size * 10000))
             
             if action == 'SELL':
-                return round((1 - ((np.mean([maX,maY]))/price)) * (size * 100000))
+                if self.limit == self.buy_sigs:
+                    return self.position()
+                else:
+                    return round((1 - ((np.mean([maX,maY]))/price)) * (size * 10000))
         
         
         def macroBandTest(self, pair):
@@ -91,22 +100,15 @@ class Algo():
             ask   = self.live(pair)[1] #buy
             bid   = self.live(pair)[0] #sell
             
-            bid = float(Decimal(bid) - Decimal(.00002))
-            ask = float(Decimal(ask) + Decimal(.00002))
+            bid = float(Decimal(bid) - Decimal(.00005))
+            ask = float(Decimal(ask) + Decimal(.00005))            
     
-            ma10 = self.MA10(pair).tail(1).to_list()
-            ma5  = self.MA5(pair).tail(1).to_list()
-            ma10 = ma10[0]
-            ma5  = ma5[0]
-            
-            
             ma30 = self.MA30(pair).tail(1).to_list()
             ma35 = self.MA35(pair).tail(1).to_list()
             ma30 = ma30[0]
             ma35 = ma35[0]
-            
-            
-            
+
+
             if ask < ma30 and ask < ma35:  #ask price is below MA's, buy
                 if self.buy_sigs < self.limit: 
                     trigger = 'BUY'
@@ -134,8 +136,8 @@ class Algo():
             bid   = self.live(pair)[0] #sell
             order = []
             
-            bid = float(Decimal(bid) - Decimal(.00002))
-            ask = float(Decimal(ask) + Decimal(.00002))
+            bid = float(Decimal(bid) - Decimal(.00005))
+            ask = float(Decimal(ask) + Decimal(.00005))
             
     
             ma10 = self.MA10(pair).tail(1).to_list()

@@ -29,11 +29,11 @@ class Client():
             contract = Forex(pair)
             reqData = ib.reqMktData(contract, '', False, False)
             data = ib.ticker(contract)
-            ib.sleep(.05)
+            ib.sleep(1)
             return [data.bid, data.ask]
     
         def positions(self):
-            for pos in self.portfolio:
+            for pos in self.portfolio():
                 return ([pos.contract.symbol, pos.position])
         
         def forexOrder(self, order_array: list):
@@ -43,12 +43,16 @@ class Client():
             price  = order_array[3]
             
             contract = Forex(pair)
-            order = LimitOrder(action, qnty, price)
+            order = MarketOrder(action, qnty)
             ib.qualifyContracts(contract)
             
             trade = ib.placeOrder(contract, order)
+            
+        def cancelOrder(self, order):
+             ib.sleep(5)
+             ib.cancelOrder(order)
+             print('Canceled')
         
-
 
 
 

@@ -29,7 +29,8 @@ class Client():
             contract = Forex(pair)
             reqData = ib.reqMktData(contract, '', False, False)
             data = ib.ticker(contract)
-            ib.sleep(1)
+            ib.sleep(2)
+            print([data.bid, data.ask])
             return [data.bid, data.ask]
     
         def positions(self):

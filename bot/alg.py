@@ -22,7 +22,10 @@ class Algo():
             self.inv = 0
         
         def position(self):
-            return client.positions[1]
+            if client.positions():
+                return client.positions()[1]
+            else:
+                return 0
 
         def live(self, pair):
             return client.forexLive(pair)
@@ -83,13 +86,13 @@ class Algo():
         def qnty(self, maX, maY, price, action, size: int):
             
             if action == 'BUY':
-                if self.limit == self.sell_sigs:
+                if self.limit == self.sell_sigs and self.position() < 0:
                     return -self.position()
                 else:
                     return round((1 - (price/(np.mean([maX,maY])))) * (size * 10000))
             
             if action == 'SELL':
-                if self.limit == self.buy_sigs:
+                if self.limit == self.buy_sigs and self.position() > 0:
                     return self.position()
                 else:
                     return round((1 - ((np.mean([maX,maY]))/price)) * (size * 10000))
@@ -97,8 +100,9 @@ class Algo():
         
         def macroBandTest(self, pair):
             order = []
-            ask   = self.live(pair)[1] #buy
-            bid   = self.live(pair)[0] #sell
+            prices = self.live(pair)
+            ask   = prices[1] #buy
+            bid   = prices[0] #sell
             
             bid = float(Decimal(bid) - Decimal(.00005))
             ask = float(Decimal(ask) + Decimal(.00005))            
@@ -132,8 +136,9 @@ class Algo():
             return order      
         
         def microBandTest(self, pair):
-            ask   = self.live(pair)[1] #buy
-            bid   = self.live(pair)[0] #sell
+            prices = self.live(pair)
+            ask   = prices[1] #buy
+            bid   = prices[0] #sell
             order = []
             
             bid = float(Decimal(bid) - Decimal(.00005))

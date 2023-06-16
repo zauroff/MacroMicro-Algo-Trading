@@ -70,7 +70,7 @@ class MicroMacro(Strategy):
         #MACRO
         
         if self.tick % 20 == 0:
-            price = float(Decimal(price) + Decimal(.00005))
+            price = float(Decimal(price) + Decimal(.00005)
             if price < ma30 and price < ma35:
                 if self.buysig < self.limit:
                     

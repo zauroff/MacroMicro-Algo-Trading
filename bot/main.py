@@ -18,16 +18,16 @@ def main():
     
     while True:
         time.sleep(.25) 
-        a.pricePlot(pair, tail = 30, tick = tick, graph= False)
+        a.pricePlot(pair, tail = 30, tick = tick, graph= True)
         tick += 1
-
-        if tick % 20 == 0:
+ 
+        if tick % 250 == 0:
             macro = a.macroBandTest(pair)[0]
             print("macro", macro)
             if (macro[2] == 'BUY') or (macro[2] == 'SELL'):
                 client.forexOrder(macro)
                 
-        if tick % a.microDelay(30) == 0:
+        if tick % a.microDelay(100) == 0:
             micro = a.microBandTest(pair)[0]
             print("micro", micro)
             if (micro[2] == 'BUY') or (micro[2] == 'SELL'):

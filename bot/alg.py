@@ -87,13 +87,13 @@ class Algo():
             
             if action == 'BUY':
                 if self.limit == self.sell_sigs and self.position() < 0:
-                    return -self.position()
+                    return round(-self.position() * .5)
                 else:
                     return round((1 - (price/(np.mean([maX,maY])))) * (size * 10000))
             
             if action == 'SELL':
                 if self.limit == self.buy_sigs and self.position() > 0:
-                    return self.position()
+                    return round(self.position() * .5)
                 else:
                     return round((1 - ((np.mean([maX,maY]))/price)) * (size * 10000))
         

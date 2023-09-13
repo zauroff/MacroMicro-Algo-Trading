@@ -11,8 +11,6 @@ from ibkr import client
 client = client.Client()
 
 
-
-
 class Algo():
 
         def __init__(self):
@@ -66,7 +64,7 @@ class Algo():
                 ma10 = self.MA10(pair).tail(tail)
                 ma30 = self.MA30(pair).tail(tail)
                 ma35 = self.MA35(pair).tail(tail)
-                hist = client.forexHistorical(pair, '2 D', '1 min').tail(tail)
+                hist = client.forexHistorical(pair, '5 D', '1 min').tail(tail)
                 hist = hist['close']
                 
                 plt.style.use('dark_background')
@@ -87,15 +85,19 @@ class Algo():
             
             if action == 'BUY':
                 if self.limit == self.sell_sigs and self.position() < 0:
-                    return round(-self.position() * .5)
+                    quantity =  round(-self.position() * .5)
                 else:
-                    return round((1 - (price/(np.mean([maX,maY])))) * (size * 10000))
+                    quantity =  round((1 - (price/(np.mean([maX,maY])))) * (size * 10000))
             
             if action == 'SELL':
                 if self.limit == self.buy_sigs and self.position() > 0:
-                    return round(self.position() * .5)
+                    quantity =  round(self.position() * .5)
                 else:
-                    return round((1 - ((np.mean([maX,maY]))/price)) * (size * 10000))
+                    quantity =  round((1 - ((np.mean([maX,maY]))/price)) * (size * 10000))
+                    
+            if quantity < 0 or quantity > 100000:
+                print("ERROR - QNTY EXCEEDS LIMIT OF 100,000")
+                return 0
         
         
         def macroBandTest(self, pair):
@@ -116,7 +118,7 @@ class Algo():
             if ask < ma30 and ask < ma35:  #ask price is below MA's, buy
                 if self.buy_sigs < self.limit: 
                     trigger = 'BUY'
-                    qnty = self.qnty(ma30,ma35, ask, trigger, 100)
+                    qnty = self.qnty(ma30,ma35, ask, trigger, 5000)
                     self.buy_sigs += 1
                     self.sell_sigs = 0
                     self.inv += qnty
@@ -126,7 +128,7 @@ class Algo():
             if bid > ma30 and bid > ma35:  #bid price is above MA's, sell 
                 if self.sell_sigs < self.limit:
                     trigger = 'SELL'
-                    qnty = self.qnty(ma30,ma35, bid, trigger, 100)
+                    qnty = self.qnty(ma30,ma35, bid, trigger, 5000)
                     self.sell_sigs += 1
                     self.buy_sigs = 0
                     self.inv -= qnty
@@ -154,7 +156,7 @@ class Algo():
             if ask < ma5 and ask < ma10: #ask price is below MA's, Buy
                 if self.buy_sigs < self.limit:                                               
                     trigger = 'BUY'
-                    qnty = self.qnty(ma5,ma10, ask, trigger, 100)
+                    qnty = self.qnty(ma5,ma10, ask, trigger, 1000)
                     self.buy_sigs += 1
                     self.sell_sigs = 0
                     self.inv += qnty
@@ -165,7 +167,7 @@ class Algo():
             if bid > ma5 and bid > ma10: #bid price is higher than MA's, sell
                 if self.sell_sigs < self.limit:
                     trigger = 'SELL'
-                    qnty = self.qnty(ma5,ma10, bid, trigger, 100)
+                    qnty = self.qnty(ma5,ma10, bid, trigger, 1000)
                     self.sell_sigs += 1
                     self.buy_sigs = 0
                     self.inv -= qnty

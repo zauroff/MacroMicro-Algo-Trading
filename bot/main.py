@@ -17,8 +17,7 @@ def main():
     pair = 'EURUSD'
     
     while True:
-        time.sleep(.25) 
-        a.pricePlot(pair, tail = 30, tick = tick, graph= True)
+        a.pricePlot(pair, tail = 30, tick = tick, graph= False)
         tick += 1
  
         if tick % 250 == 0:
